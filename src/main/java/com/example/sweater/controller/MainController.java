@@ -1,4 +1,4 @@
-package com.example.sweater;
+package com.example.sweater.controller;
 
 import com.example.sweater.domain.Message;
 import com.example.sweater.repositories.MessageRepository;
@@ -14,13 +14,12 @@ import java.util.List;
 import java.util.Map;
 
 @Controller //контроллер - моуль программы, который слушает запросы и возвращает какие-то данные
-public class GreetingController {
+public class MainController {
     @Autowired
     private MessageRepository messageRepository;
 
     @GetMapping("/")
-    public String greeting(
-            @RequestParam(name="name", required=false, defaultValue="World") String name, Map<String,Object> model) {
+    public String greeting(@RequestParam(name = "name",required = false, defaultValue = "World")String name, Map<String, Object> model) {
         model.put("name", name);
         return "greeting";
     }
