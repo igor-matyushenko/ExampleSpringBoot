@@ -1,8 +1,10 @@
 package com.example.sweater.controller;
 
 import com.example.sweater.domain.Message;
+import com.example.sweater.domain.User;
 import com.example.sweater.repositories.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +21,7 @@ public class MainController {
     private MessageRepository messageRepository;
 
     @GetMapping("/")
-    public String greeting(@RequestParam(name = "name",required = false, defaultValue = "World")String name, Map<String, Object> model) {
+    public String greeting(@RequestParam(name = "name",required = false, defaultValue = "user")String name, Map<String, Object> model) {
         model.put("name", name);
         return "greeting";
     }
@@ -32,8 +34,12 @@ public class MainController {
     }
 
     @PostMapping("/add")
-    public String add(@RequestParam(name = "text") String text, @RequestParam(name = "tag") String tag, Map<String, Object> model){
-        Message message = new Message(text,tag);
+    public String add(
+            @AuthenticationPrincipal User user,
+            @RequestParam(name = "text") String text,
+            @RequestParam(name = "tag") String tag,
+            Map<String, Object> model){
+        Message message = new Message(text,tag,user);
         messageRepository.save(message);
         Iterable<Message> messages = messageRepository.findAll();
         model.put("messages",messages);

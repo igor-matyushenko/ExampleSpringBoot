@@ -13,12 +13,26 @@ public class Message {
     private String text;
     private String tag;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+
     public Message() {
     }
 
-    public Message( String text, String tag) {
+    public Message( String text, String tag, User author) {
         this.text = text;
         this.tag = tag;
+        this.user = author;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public Long getId() {
