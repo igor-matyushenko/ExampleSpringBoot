@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
 import java.util.Map;
 
 @Controller //контроллер - моуль программы, который слушает запросы и возвращает какие-то данные
@@ -24,19 +25,31 @@ public class GreetingController {
         return "greeting";
     }
 
-    @GetMapping
+    @GetMapping("/")
     public String main(Map<String, Object> model){
         Iterable<Message> messages = messageRepository.findAll();
-        model.put("message",messages);
+        model.put("messages",messages);
         return "main";
     }
 
-    @PostMapping
+    @PostMapping("add")
     public String add(@RequestParam(name = "text") String text, @RequestParam(name = "tag") String tag, Map<String, Object> model){
         Message message = new Message(text,tag);
         messageRepository.save(message);
         Iterable<Message> messages = messageRepository.findAll();
-        model.put("message",messages);
+        model.put("messages",messages);
+        return "main";
+    }
+
+    @PostMapping("filter")
+    public String filter(@RequestParam(name = "filter") String text, Map<String, Object> model){
+        Iterable<Message> messages;
+        if(text != null && text.isEmpty()){
+            messages = messageRepository.findAll();
+        } else {
+            messages = messageRepository.findByTag(text);
+        }
+        model.put("messages",messages);
         return "main";
     }
 
