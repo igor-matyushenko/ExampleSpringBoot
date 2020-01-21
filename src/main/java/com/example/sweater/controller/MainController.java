@@ -20,16 +20,24 @@ public class MainController {
     @Autowired
     private MessageRepository messageRepository;
 
-    @GetMapping("/")
+    @GetMapping
     public String greeting(@RequestParam(name = "name",required = false, defaultValue = "user")String name, Map<String, Object> model) {
         model.put("name", name);
         return "greeting";
     }
 
+
+
     @GetMapping("/main")
-    public String main(Map<String, Object> model){
-        Iterable<Message> messages = messageRepository.findAll();
-        model.put("messages",messages);
+    public String main(@RequestParam(name = "filter", required = false, defaultValue = "") String filter, Model model){
+        Iterable<Message> messages;
+        if(filter != null && filter.isEmpty()){
+            messages = messageRepository.findAll();
+        } else {
+            messages = messageRepository.findByTag(filter);
+        }
+        model.addAttribute("messages",messages);
+        model.addAttribute("filter", filter);
         return "main";
     }
 
@@ -38,25 +46,16 @@ public class MainController {
             @AuthenticationPrincipal User user,
             @RequestParam(name = "text") String text,
             @RequestParam(name = "tag") String tag,
-            Map<String, Object> model){
+            Model model){
         Message message = new Message(text,tag,user);
         messageRepository.save(message);
         Iterable<Message> messages = messageRepository.findAll();
-        model.put("messages",messages);
+        model.addAttribute("messages",messages);
+        model.addAttribute("filter", "");
         return "main";
     }
 
-    @PostMapping("/filter")
-    public String filter(@RequestParam(name = "filter") String text, Map<String, Object> model){
-        Iterable<Message> messages;
-        if(text != null && text.isEmpty()){
-            messages = messageRepository.findAll();
-        } else {
-            messages = messageRepository.findByTag(text);
-        }
-        model.put("messages",messages);
-        return "main";
-    }
+
 
 
 }
